@@ -1,0 +1,17 @@
+actor: AcceptanceTester
+modules:
+  enabled:
+    - WebDriver:
+        url: "http://yandex.ru/"
+        browser: firefox
+    - \Helper\Acceptance
+    - Asserts
+env:
+    chrome:
+         modules:
+            config:
+                WebDriver:
+                    browser: 'chrome'
+
+    firefox:
+        # nothing changed
