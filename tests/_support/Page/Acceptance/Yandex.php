@@ -16,6 +16,7 @@ class Yandex
     public $thumbVideoInRightColumn = '.Carousel-Content .VideoThumbPreview';
     public $playedVideoInRightColumn = '.Carousel-Content .VideoThumbPreview > :nth-child(1)';
     public $autoplayedVideo = '.VideoPlayer [allow*="autoplay"]';
+    public $videoFrame = '.VideoPlayer iframe';
 
 
     protected $I;
@@ -36,6 +37,14 @@ class Yandex
         $locator = str_replace('%d', random_int(1, $count), $this->searchItem);
         $this->I->seeElement($locator);
         $this->I->click($locator);
+    }
+
+    public function videoShouldStartPlayingAfterClickOnThumbnail()
+    {
+        $this->clickOnRandomSearchResult();
+        $this->I->waitForElement($this->autoplayedVideo, 10);
+        $src = $this->I->grabAttributeFrom($this->videoFrame, 'src');
+        $this->I->assertStringContainsString('autoplay=1', $src, 'Видео не проигрывается автоматически после клика на превью');
     }
 
     public function searchResultsShouldBeCorrect(String $query)
