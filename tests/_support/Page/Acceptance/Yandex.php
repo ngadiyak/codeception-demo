@@ -11,10 +11,12 @@ class Yandex
     public $videoTab = '.service_name_video a';
     public $searchButton = '.search2__button button';
     public $searchItem = '.serp-list__items > :nth-child(%d)';
+    public $searchItemSing = '.serp-item';
     public $searchItemTitle = '.serp-list__items > :nth-child(%d) .serp-item__title';
     public $thumbVideoInRightColumn = '.Carousel-Content .VideoThumbPreview';
     public $playedVideoInRightColumn = '.Carousel-Content .VideoThumbPreview > :nth-child(1)';
     public $autoplayedVideo = '.VideoPlayer [allow*="autoplay"]';
+    public $videoFrame = '.VideoPlayer iframe';
 
 
     protected $I;
@@ -31,15 +33,23 @@ class Yandex
 
     public function clickOnRandomSearchResult()
     {
-        $count = $this->I->executeJS("return document.getElementsByClassName('serp-item').length");
+        $count = count($this->I->grabMultiple($this->searchItemSing));
         $locator = str_replace('%d', random_int(1, $count), $this->searchItem);
         $this->I->seeElement($locator);
         $this->I->click($locator);
     }
 
+    public function videoShouldStartPlayingAfterClickOnThumbnail()
+    {
+        $this->clickOnRandomSearchResult();
+        $this->I->waitForElement($this->autoplayedVideo, 10);
+        $src = $this->I->grabAttributeFrom($this->videoFrame, 'src');
+        $this->I->assertStringContainsString('autoplay=1', $src, 'Видео не проигрывается автоматически после клика на превью');
+    }
+
     public function searchResultsShouldBeCorrect(String $query)
     {
-        $count = $this->I->executeJS("return document.getElementsByClassName('serp-item').length");
+        $count = count($this->I->grabMultiple($this->searchItemSing));
 
         $this->I->assertTrue($count > 0, 'Не найдены результаты поиска');
 
